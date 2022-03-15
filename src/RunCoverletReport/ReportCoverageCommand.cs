@@ -177,6 +177,13 @@ Folder searched: " + testOutputFolder;
 
         private (string cmd, string args) GetCommandArgsForCoverletMSBuild(string slnFile, string testOutputFolder)
         {
+            string coverletRunsettingsPath = string.Empty;
+            if (!string.IsNullOrWhiteSpace(CoverageResultsProvider.Instance.Options.CoverletRunsettingsPath) &&
+                File.Exists(CoverageResultsProvider.Instance.Options.CoverletRunsettingsPath))
+            {
+                coverletRunsettingsPath = $"--settings:\"{CoverageResultsProvider.Instance.Options.CoverletRunsettingsPath}\"";
+            }
+
             string exludeAssembliesArg = string.Empty;
             if (!string.IsNullOrWhiteSpace(CoverageResultsProvider.Instance.Options.ExcludeAssembliesPattern))
             {
@@ -189,7 +196,7 @@ Folder searched: " + testOutputFolder;
                 noRestoreArg = " --no-restore";
             }
 
-            string args = $"test \"{slnFile}\" /p:CollectCoverage=true /p:CoverletOutput=\"{testOutputFolder}coverage\" {exludeAssembliesArg} /p:CoverletOutputFormat=\"json%2ccobertura\" /p:MergeWith=\"{testOutputFolder}coverage.json\" -m:1{noRestoreArg}";
+            string args = $"test \"{slnFile}\" {coverletRunsettingsPath} /p:CollectCoverage=true /p:CoverletOutput=\"{testOutputFolder}coverage\" {exludeAssembliesArg} /p:CoverletOutputFormat=\"json%2ccobertura\" /p:MergeWith=\"{testOutputFolder}coverage.json\" -m:1{noRestoreArg}";
 
             return ("dotnet", args);
         }
@@ -239,6 +246,13 @@ Folder searched: " + testOutputFolder;
 
         private (string cmd, string args) GetCommandArgsForCoverletCollector(string slnFile, string testOutputFolder)
         {
+            string coverletRunsettingsPath = string.Empty;
+            if (!string.IsNullOrWhiteSpace(CoverageResultsProvider.Instance.Options.CoverletRunsettingsPath) &&
+                File.Exists(CoverageResultsProvider.Instance.Options.CoverletRunsettingsPath))
+            {
+                coverletRunsettingsPath = $"--settings:\"{CoverageResultsProvider.Instance.Options.CoverletRunsettingsPath}\"";
+            }
+
             string excludeAssembliesArg = string.Empty;
             if (!string.IsNullOrWhiteSpace(CoverageResultsProvider.Instance.Options.ExcludeAssembliesPattern))
             {
@@ -251,7 +265,7 @@ Folder searched: " + testOutputFolder;
                 noRestoreArg = " --no-restore";
             }
 
-            string args = $"test \"{slnFile}\" /p:CoverletOutputFormat=\"cobertura\" --collect:\"XPlat Code Coverage\" --results-directory:\"{testOutputFolder}coverage\"{noRestoreArg} {excludeAssembliesArg}";
+            string args = $"test \"{slnFile}\" {coverletRunsettingsPath} /p:CoverletOutputFormat=\"cobertura\" --collect:\"XPlat Code Coverage\" --results-directory:\"{testOutputFolder}coverage\"{noRestoreArg} {excludeAssembliesArg}";
 
             return ("dotnet", args);
         }
